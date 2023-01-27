@@ -13,3 +13,5 @@ C:\dev\Training\Day1\Sandbox\AddressBook\obj\Debug\net7.0\refint\AddressBook.dll
 C:\dev\Training\Day1\Sandbox\AddressBook\obj\Debug\net7.0\AddressBook.pdb
 C:\dev\Training\Day1\Sandbox\AddressBook\obj\Debug\net7.0\AddressBook.genruntimeconfig.cache
 C:\dev\Training\Day1\Sandbox\AddressBook\obj\Debug\net7.0\ref\AddressBook.dll
+C:\dev\Training\Day1\Sandbox\AddressBook\bin\Debug\net7.0\CsvHelper.dll
+C:\dev\Training\Day1\Sandbox\AddressBook\obj\Debug\net7.0\AddressBook.csproj.CopyComplete

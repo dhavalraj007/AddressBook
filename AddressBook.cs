@@ -1,12 +1,17 @@
+using CsvHelper;
+using System.Formats.Asn1;
+using System.Globalization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace MyApp
 {
-    //add,edit,delete
+    [Serializable]
     class AddressBook
     {
-        Dictionary<string,Person> name2Person;
-        public string name;
+        public Dictionary<string, Person> name2Person { get; set; }
+        public string name { get; set; }
         public AddressBook(string name)
         {
             this.name = name;
@@ -123,6 +128,71 @@ namespace MyApp
                 ret+= "\n\n---------------------\n"+ kvp.Value.ToString();
             }
             return ret;
+        }
+
+        public void SortByFieldPrint(string fieldName)
+        {
+            var getfieldVal = (Person p)=> p.GetType().GetProperty(fieldName).GetValue(p) as string;
+
+            var plist = name2Person.Values.ToList();
+            plist.Sort((p1, p2) => getfieldVal(p1).CompareTo(getfieldVal(p2)));
+
+            Console.WriteLine("------------------------");
+            Console.WriteLine("Sorted by "+ fieldName);
+            Console.WriteLine("------------------------");
+            foreach(Person p in plist)
+                Console.WriteLine(p.ToString());
+            Console.WriteLine("------------------------");
+        }
+
+        public void SerializeObject(string path)
+        {
+            FileStream fs = File.OpenWrite(path);
+            BinaryFormatter bf = new BinaryFormatter();
+            bf.Serialize(fs, this);
+            fs.Flush();
+            fs.Close();
+        }
+
+        public static AddressBook DeserializeObject(string path)
+        {
+            FileStream fs = File.OpenRead(path);
+            BinaryFormatter bf = new BinaryFormatter();
+            var ret = bf.Deserialize(fs) as AddressBook;
+            fs.Flush();
+            fs.Close();
+            return ret;
+        }
+
+        public void SerializeToJson(string path)
+        {
+            File.WriteAllText(path, JsonSerializer.Serialize(this));
+        }
+
+        public static AddressBook DeserializeFromJson(string path)
+        {
+            return JsonSerializer.Deserialize<AddressBook>(File.ReadAllText(path));
+        }
+
+
+
+        public void SerializePersonsToCSV(string path)
+        {
+            StreamWriter streamWriter = new StreamWriter(path);
+            CsvWriter csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
+            csvWriter.WriteRecords(name2Person.Values.ToList());
+            csvWriter.Flush();
+            streamWriter.Close();
+        }
+
+        public void LoadPersonsFromCSV(string path)
+        {
+            StreamReader streamReader = new StreamReader(path);
+            CsvReader csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture);
+            foreach(Person p in csvReader.GetRecords<Person>())
+            {
+                name2Person[p.firstname+p.lastname] = p;
+            }
         }
     }
 
